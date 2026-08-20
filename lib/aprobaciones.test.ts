@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estaPendienteDeRevision, etiquetaEstado } from "./aprobaciones";
+import { accionesDisponibles, estaPendienteDeRevision, etiquetaEstado } from "./aprobaciones";
 
 describe("estaPendienteDeRevision", () => {
   it("es true para pendiente y en_revision", () => {
@@ -18,5 +18,21 @@ describe("etiquetaEstado", () => {
     expect(etiquetaEstado("en_revision")).toBe("En revisión");
     expect(etiquetaEstado("aprobado")).toBe("Aprobado");
     expect(etiquetaEstado("rechazado")).toBe("Rechazado");
+  });
+});
+
+describe("accionesDisponibles", () => {
+  it("proveedor pendiente: aprobar o rechazar, sin pedir revision", () => {
+    expect(accionesDisponibles("proveedor", "pendiente")).toEqual(["aprobar", "rechazar"]);
+  });
+  it("repartidor pendiente: aprobar, rechazar o pedir revision", () => {
+    expect(accionesDisponibles("repartidor", "pendiente")).toEqual(["aprobar", "rechazar", "pedir_revision"]);
+  });
+  it("repartidor en_revision: solo aprobar o rechazar (ya se pidio revision)", () => {
+    expect(accionesDisponibles("repartidor", "en_revision")).toEqual(["aprobar", "rechazar"]);
+  });
+  it("estado ya resuelto: sin acciones", () => {
+    expect(accionesDisponibles("proveedor", "aprobado")).toEqual([]);
+    expect(accionesDisponibles("repartidor", "rechazado")).toEqual([]);
   });
 });
