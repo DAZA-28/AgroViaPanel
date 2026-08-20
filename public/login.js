@@ -22,36 +22,42 @@ form.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
   submitButton.textContent = "Entrando...";
 
-  const { data, error: authError } = await supabase.auth.signInWithPassword({
-    email: emailInput.value,
-    password: passwordInput.value,
-  });
+  try {
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email: emailInput.value,
+      password: passwordInput.value,
+    });
 
-  if (authError || !data.user) {
-    window.RobotController.showError("Correo o contraseña incorrectos.");
+    if (authError || !data.user) {
+      window.RobotController.showError("Correo o contraseña incorrectos.");
+      submitButton.disabled = false;
+      submitButton.textContent = "Entrar";
+      return;
+    }
+
+    const { data: staff, error: staffError } = await supabase
+      .from("staff_dashboard")
+      .select("*")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+
+    if (staffError || !staff || !staff.activo) {
+      await supabase.auth.signOut();
+      window.RobotController.showError("Tu cuenta no tiene acceso al panel.");
+      submitButton.disabled = false;
+      submitButton.textContent = "Entrar";
+      return;
+    }
+
+    window.RobotController.fullCelebration("¡Bienvenido!");
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1200);
+  } catch (err) {
+    window.RobotController.showError("No se pudo conectar. Revisá tu conexión.");
     submitButton.disabled = false;
     submitButton.textContent = "Entrar";
-    return;
   }
-
-  const { data: staff, error: staffError } = await supabase
-    .from("staff_dashboard")
-    .select("*")
-    .eq("user_id", data.user.id)
-    .maybeSingle();
-
-  if (staffError || !staff || !staff.activo) {
-    await supabase.auth.signOut();
-    window.RobotController.showError("Tu cuenta no tiene acceso al panel.");
-    submitButton.disabled = false;
-    submitButton.textContent = "Entrar";
-    return;
-  }
-
-  window.RobotController.fullCelebration("¡Bienvenido!");
-  setTimeout(() => {
-    window.location.href = "/";
-  }, 1200);
 });
 
 document.addEventListener("DOMContentLoaded", () => {

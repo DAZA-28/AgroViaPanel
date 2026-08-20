@@ -224,7 +224,7 @@ const RobotController = {
         this.state = state;
         this.robot.className = 'robot';
         this.mouth.className = 'robot-mouth';
-        this.speech.className = 'robot-speech';
+        this.speech.classList.remove('error', 'warning');
 
         switch(state) {
             case 'happy':
@@ -288,8 +288,8 @@ const RobotController = {
     },
 
     // ==================== SPEECH ====================
-    speak(message, duration = 3500, type = 'normal') {
-        this.registerActivity();
+    speak(message, duration = 3500, type = 'normal', silent = false) {
+        if (!silent) this.registerActivity();
         this.speech.textContent = message;
         this.speech.className = 'robot-speech show';
 
@@ -366,7 +366,7 @@ const RobotController = {
     sleep() {
         this.isSleeping = true;
         this.setState('sleeping');
-        this.speak('💤 Zzz...', 2000);
+        this.speak('💤 Zzz...', 2000, 'normal', true);
     },
 
     wakeUp() {
