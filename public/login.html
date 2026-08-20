@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar sesión - AgroViaPanel</title>
+<link rel="stylesheet" href="/login.css">
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<canvas id="particles-canvas"></canvas>
+
+<div class="idle-indicator" id="idleIndicator">💤 Robot descansando...</div>
+
+<div class="main-wrapper">
+
+    <div class="container">
+        <h2>AgroViaPanel</h2>
+
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="📧 Correo" required autocomplete="email">
+            <input type="password" id="password" placeholder="🔒 Contraseña" required autocomplete="current-password">
+            <button type="submit" id="submitButton">Entrar</button>
+        </form>
+    </div>
+
+    <div class="robot-container" id="robotContainer">
+        <div class="robot" id="robot">
+            <div class="robot-speech" id="robotSpeech"></div>
+            <div class="robot-thought" id="robotThought"></div>
+            <div class="robot-zzz">💤</div>
+
+            <div class="robot-head">
+                <div class="robot-antenna"></div>
+                <div class="robot-ear left"></div>
+                <div class="robot-ear right"></div>
+                <div class="robot-screen">
+                    <div class="robot-eyebrow left"></div>
+                    <div class="robot-eyebrow right"></div>
+                    <div class="robot-eyes">
+                        <div class="robot-eye" id="leftEye">
+                            <div class="robot-pupil" id="leftPupil"></div>
+                        </div>
+                        <div class="robot-eye" id="rightEye">
+                            <div class="robot-pupil" id="rightPupil"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="robot-mouth" id="robotMouth">
+                    <div class="robot-tongue"></div>
+                </div>
+            </div>
+
+            <div class="robot-body">
+                <div class="robot-core" id="robotCore">💚</div>
+                <div class="robot-buttons">
+                    <div class="robot-button"></div>
+                    <div class="robot-button"></div>
+                    <div class="robot-button"></div>
+                </div>
+            </div>
+
+            <div class="robot-arm left"></div>
+            <div class="robot-arm right"></div>
+
+            <div class="robot-legs">
+                <div class="robot-leg"></div>
+                <div class="robot-leg"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="/robot.js"></script>
+<script type="module" src="/login.js"></script>
+</body>
+</html>
