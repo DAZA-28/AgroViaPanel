@@ -17,7 +17,7 @@ export default async function EquipoPage() {
   return (
     <div>
       <h1 style={{ color: "var(--primary)" }}>Equipo</h1>
-      <EquipoTable equipoInicial={(equipo ?? []) as StaffRow[]} />
+      <EquipoTable equipoInicial={(equipo ?? []) as StaffRow[]} miPropioId={staff.id} />
     </div>
   );
 }

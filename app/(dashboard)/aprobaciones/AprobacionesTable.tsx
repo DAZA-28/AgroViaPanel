@@ -3,10 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { estaPendienteDeRevision, etiquetaEstado } from "@/lib/aprobaciones";
+import { etiquetaEstado } from "@/lib/aprobaciones";
 import type { ProveedorRow, RepartidorRow } from "@/lib/types";
 
 type Fila = { tipo: "proveedor" | "repartidor"; id: number; nombre: string; email: string; estado: string; created_at: string };
+
+const COLUMNAS_PROVEEDOR =
+  "id, nombre, email, tienda_id, telefono, tipo_proveedor, cedula, cedula_juridica, nombre_representante, cedula_representante, verificado_mag, estado_aprobacion, comentario_revision, revisado_por, revisado_en, created_at";
+const COLUMNAS_REPARTIDOR =
+  "id, nombre, email, telefono, activo, foto_url, cedula, tipo_vehiculo, placa, estado_aprobacion, comentario_revision, revisado_por, revisado_en, created_at";
+
+const ESTADOS_PENDIENTES = ["pendiente", "en_revision"];
 
 export function AprobacionesTable() {
   const [filas, setFilas] = useState<Fila[]>([]);
@@ -17,17 +24,15 @@ export function AprobacionesTable() {
 
     async function cargar() {
       const [{ data: proveedores }, { data: repartidores }] = await Promise.all([
-        supabase.from("proveedores").select("*").returns<ProveedorRow[]>(),
-        supabase.from("repartidores").select("*").returns<RepartidorRow[]>(),
+        supabase.from("proveedores").select(COLUMNAS_PROVEEDOR).in("estado_aprobacion", ESTADOS_PENDIENTES).returns<ProveedorRow[]>(),
+        supabase.from("repartidores").select(COLUMNAS_REPARTIDOR).in("estado_aprobacion", ESTADOS_PENDIENTES).returns<RepartidorRow[]>(),
       ]);
 
       const filasProveedores: Fila[] = (proveedores ?? [])
-        .filter((p) => estaPendienteDeRevision(p.estado_aprobacion))
-        .map((p) => ({ tipo: "proveedor", id: p.id, nombre: p.nombre, email: p.email, estado: p.estado_aprobacion, created_at: p.created_at }));
+        .map((p) => ({ tipo: "proveedor" as const, id: p.id, nombre: p.nombre, email: p.email, estado: p.estado_aprobacion, created_at: p.created_at }));
 
       const filasRepartidores: Fila[] = (repartidores ?? [])
-        .filter((r) => estaPendienteDeRevision(r.estado_aprobacion))
-        .map((r) => ({ tipo: "repartidor", id: r.id, nombre: r.nombre, email: r.email, estado: r.estado_aprobacion, created_at: r.created_at }));
+        .map((r) => ({ tipo: "repartidor" as const, id: r.id, nombre: r.nombre, email: r.email, estado: r.estado_aprobacion, created_at: r.created_at }));
 
       setFilas([...filasProveedores, ...filasRepartidores]);
     }

@@ -1,11 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { NAV_ITEMS } from "@/lib/nav-items";
+import { createClient } from "@/lib/supabase/client";
 
 export function Nav({ rol }: { rol: "admin" | "operador" }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function cerrarSesion() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
+
   return (
     <nav style={{ width: 220, background: "var(--bg-card)", padding: 20, minHeight: "100vh" }}>
       <div style={{ color: "var(--primary)", fontWeight: "bold", fontSize: 20, marginBottom: 24 }}>
@@ -33,6 +43,23 @@ export function Nav({ rol }: { rol: "admin" | "operador" }) {
           Equipo
         </Link>
       )}
+      <button
+        onClick={cerrarSesion}
+        style={{
+          display: "block",
+          width: "100%",
+          textAlign: "left",
+          padding: "10px 12px",
+          marginTop: 20,
+          background: "transparent",
+          border: "none",
+          borderTop: "1px solid var(--border-color)",
+          color: "var(--text-muted)",
+          cursor: "pointer",
+        }}
+      >
+        Cerrar sesión
+      </button>
     </nav>
   );
 }

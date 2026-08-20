@@ -27,7 +27,7 @@ export function AccionesAprobacion({ tipo, id, estado }: { tipo: "proveedor" | "
 
     const nuevoEstado = accion === "aprobar" ? "aprobado" : accion === "rechazar" ? "rechazado" : "en_revision";
 
-    await supabase
+    const { data } = await supabase
       .from(TABLA[tipo])
       .update({
         estado_aprobacion: nuevoEstado,
@@ -35,9 +35,16 @@ export function AccionesAprobacion({ tipo, id, estado }: { tipo: "proveedor" | "
         revisado_por: user?.id ?? null,
         revisado_en: new Date().toISOString(),
       })
-      .eq("id", id);
+      .eq("id", id)
+      .select();
 
     setEnviando(false);
+
+    if (!data || data.length === 0) {
+      alert("No se pudo guardar la decisión. Puede que no tengas permiso o la solicitud ya haya cambiado.");
+      return;
+    }
+
     router.push("/aprobaciones");
     router.refresh();
   }
