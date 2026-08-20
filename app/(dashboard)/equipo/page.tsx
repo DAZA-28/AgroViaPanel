@@ -7,7 +7,7 @@ import type { StaffRow } from "@/lib/types";
 export default async function EquipoPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/login.html");
 
   const staff = await getStaffForUser(supabase, user.id);
   if (!staff || staff.rol !== "admin") redirect("/");

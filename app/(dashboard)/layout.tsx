@@ -6,10 +6,10 @@ import { Nav } from "@/components/Nav";
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/login.html");
 
   const staff = await getStaffForUser(supabase, user.id);
-  if (!staff || !staff.activo) redirect("/login");
+  if (!staff || !staff.activo) redirect("/login.html");
 
   return (
     <div style={{ display: "flex" }}>

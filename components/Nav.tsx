@@ -12,7 +12,7 @@ export function Nav({ rol }: { rol: "admin" | "operador" }) {
   async function cerrarSesion() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/login");
+    window.location.href = "/login.html";
     router.refresh();
   }
 
