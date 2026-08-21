@@ -125,8 +125,12 @@ Reemplaza el `<nav className="sidebar">` fijo de `Nav.tsx`:
 ## 3. Equipo — invitar por email
 
 - `app/(dashboard)/equipo/InvitarForm.tsx` (nuevo, solo se renderiza si
-  `rol === "admin"` en `EquipoPage`): campos nombre/email/rol, POST a
-  `/api/equipo/invitar`, refresca la tabla al terminar.
+  `rol === "admin"` en `EquipoPage`): campos **nombre y email únicamente**
+  (sin selector de rol — el usuario pidió explícitamente que la invitación
+  agregue solo esos dos datos), POST a `/api/equipo/invitar`, refresca la
+  tabla al terminar. Toda invitación nueva entra como `"operador"`;
+  promoverla a admin se hace después desde el selector de rol que ya existe
+  en `EquipoTable.tsx` — no hace falta elegirlo en el alta.
 - `app/api/equipo/invitar/route.ts` (Next.js Route Handler nuevo):
   1. Lee la sesión desde las cookies (`lib/supabase/server.ts`, cliente
      normal) y valida `getStaffForUser(...).rol === "admin"` — si no,
