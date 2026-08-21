@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { accionesDisponibles, estaPendienteDeRevision, etiquetaEstado } from "./aprobaciones";
+import { accionesDisponibles, estaPendienteDeRevision, etiquetaEstado, varianteBadgeEstado } from "./aprobaciones";
 
 describe("estaPendienteDeRevision", () => {
   it("es true para pendiente y en_revision", () => {
@@ -18,6 +18,18 @@ describe("etiquetaEstado", () => {
     expect(etiquetaEstado("en_revision")).toBe("En revisión");
     expect(etiquetaEstado("aprobado")).toBe("Aprobado");
     expect(etiquetaEstado("rechazado")).toBe("Rechazado");
+  });
+});
+
+describe("varianteBadgeEstado", () => {
+  it("mapea cada estado a la variante de color esperada", () => {
+    expect(varianteBadgeEstado("pendiente")).toBe("warning");
+    expect(varianteBadgeEstado("en_revision")).toBe("pending");
+    expect(varianteBadgeEstado("aprobado")).toBe("success");
+    expect(varianteBadgeEstado("rechazado")).toBe("error");
+  });
+  it("cae a neutral para un estado desconocido", () => {
+    expect(varianteBadgeEstado("otro")).toBe("neutral");
   });
 });
 
