@@ -6,8 +6,8 @@ describe("NAV_ITEMS", () => {
     expect(NAV_ITEMS).toHaveLength(5);
   });
 
-  it("Métricas y Aprobaciones están habilitados; el resto no", () => {
+  it("Métricas, Aprobaciones, Pedidos en vivo y Usuarios están habilitados; el resto no", () => {
     const enabled = NAV_ITEMS.filter((i) => i.enabled).map((i) => i.href);
-    expect(enabled.sort()).toEqual(["/", "/aprobaciones"]);
+    expect(enabled.sort()).toEqual(["/", "/aprobaciones", "/pedidos", "/usuarios"]);
   });
 });

@@ -7,7 +7,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Métricas", enabled: true },
   { href: "/aprobaciones", label: "Aprobaciones", enabled: true },
-  { href: "/pedidos", label: "Pedidos en vivo", enabled: false },
+  { href: "/pedidos", label: "Pedidos en vivo", enabled: true },
   { href: "/salud", label: "Salud del sistema", enabled: false },
-  { href: "/usuarios", label: "Usuarios y actividad", enabled: false },
+  { href: "/usuarios", label: "Usuarios", enabled: true },
 ];
