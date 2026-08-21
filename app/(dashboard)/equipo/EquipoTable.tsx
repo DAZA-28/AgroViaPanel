@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { StaffRow } from "@/lib/types";
 
 export function EquipoTable({ equipoInicial, miPropioId }: { equipoInicial: StaffRow[]; miPropioId: number }) {
   const [equipo, setEquipo] = useState(equipoInicial);
+
+  useEffect(() => {
+    setEquipo(equipoInicial);
+  }, [equipoInicial]);
 
   async function cambiarRol(id: number, rol: "admin" | "operador") {
     const supabase = createClient();
@@ -28,24 +32,24 @@ export function EquipoTable({ equipoInicial, miPropioId }: { equipoInicial: Staf
   }
 
   return (
-    <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 20 }}>
+    <table className="data-table">
       <thead>
-        <tr style={{ textAlign: "left", color: "var(--text-muted)" }}>
-          <th style={{ padding: 8 }}>Nombre</th>
-          <th style={{ padding: 8 }}>Email</th>
-          <th style={{ padding: 8 }}>Rol</th>
-          <th style={{ padding: 8 }}>Activo</th>
-          <th style={{ padding: 8 }}></th>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Activo</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         {equipo.map((s) => {
           const esUnoMismo = s.id === miPropioId;
           return (
-            <tr key={s.id} style={{ borderTop: "1px solid var(--border-color)" }}>
-              <td style={{ padding: 8 }}>{s.nombre}{esUnoMismo && <span style={{ color: "var(--text-muted)" }}> (vos)</span>}</td>
-              <td style={{ padding: 8 }}>{s.email}</td>
-              <td style={{ padding: 8 }}>
+            <tr key={s.id}>
+              <td>{s.nombre}{esUnoMismo && <span className="cell-muted"> (vos)</span>}</td>
+              <td className="cell-muted">{s.email}</td>
+              <td>
                 <select
                   value={s.rol}
                   disabled={esUnoMismo}
@@ -55,12 +59,14 @@ export function EquipoTable({ equipoInicial, miPropioId }: { equipoInicial: Staf
                   <option value="operador">Operador</option>
                 </select>
               </td>
-              <td style={{ padding: 8 }}>{s.activo ? "Sí" : "No"}</td>
-              <td style={{ padding: 8 }}>
+              <td>
+                <span className={`badge badge--${s.activo ? "success" : "neutral"}`}>{s.activo ? "Sí" : "No"}</span>
+              </td>
+              <td>
                 <button
                   onClick={() => alternarActivo(s.id, s.activo)}
                   disabled={esUnoMismo}
-                  style={{ padding: "4px 10px", background: "var(--bg-card-hover)", border: "1px solid var(--border-color)", borderRadius: 6, color: "#fff", opacity: esUnoMismo ? 0.5 : 1, cursor: esUnoMismo ? "not-allowed" : "pointer" }}
+                  className="btn btn-secondary"
                 >
                   {s.activo ? "Desactivar" : "Activar"}
                 </button>

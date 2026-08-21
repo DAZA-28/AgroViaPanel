@@ -70,12 +70,18 @@ export function Nav({ rol }: { rol: "admin" | "operador" }) {
     router.refresh();
   }
 
+  function handleTouchToggle(e: React.PointerEvent) {
+    if (e.pointerType === "touch") {
+      setExpanded((prev) => !prev);
+    }
+  }
+
   return (
     <nav
       className={`sidebar${expanded ? " is-expanded" : ""}`}
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
-      onClick={() => setExpanded((prev) => !prev)}
+      onPointerDown={handleTouchToggle}
     >
       <div className="sidebar-brand">AgroVia Panel</div>
       <div className="sidebar-section">

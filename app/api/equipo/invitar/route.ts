@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   }
 
   const staff = await getStaffForUser(supabase, user.id);
-  if (!staff || staff.rol !== "admin") {
+  if (!staff || !staff.activo || staff.rol !== "admin") {
     return NextResponse.json({ ok: false, error: "Solo un admin puede invitar personas." }, { status: 403 });
   }
 
@@ -24,8 +24,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Cuerpo de la solicitud inválido." }, { status: 400 });
   }
 
-  const nombre = typeof (body as any).nombre === "string" ? (body as any).nombre.trim() : "";
-  const email = typeof (body as any).email === "string" ? (body as any).email.trim() : "";
+  const b = body as Record<string, unknown>;
+  const nombre = typeof b.nombre === "string" ? b.nombre.trim() : "";
+  const email = typeof b.email === "string" ? b.email.trim() : "";
 
   if (!nombre || !email) {
     return NextResponse.json({ ok: false, error: "Nombre y email son obligatorios." }, { status: 400 });

@@ -13,23 +13,27 @@ export function InvitarForm() {
     e.preventDefault();
     setEnviando(true);
 
-    const res = await fetch("/api/equipo/invitar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nombre, email }),
-    });
-    const data = await res.json();
+    try {
+      const res = await fetch("/api/equipo/invitar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, email }),
+      });
+      const data = await res.json();
 
-    setEnviando(false);
+      if (!data.ok) {
+        alert(data.error ?? "No se pudo enviar la invitación.");
+        return;
+      }
 
-    if (!data.ok) {
-      alert(data.error ?? "No se pudo enviar la invitación.");
-      return;
+      setNombre("");
+      setEmail("");
+      router.refresh();
+    } catch {
+      alert("No se pudo conectar con el servidor. Intentá de nuevo.");
+    } finally {
+      setEnviando(false);
     }
-
-    setNombre("");
-    setEmail("");
-    router.refresh();
   }
 
   return (
