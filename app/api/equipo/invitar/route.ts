@@ -17,9 +17,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Solo un admin puede invitar personas." }, { status: 403 });
   }
 
-  const body = await request.json();
-  const nombre = typeof body.nombre === "string" ? body.nombre.trim() : "";
-  const email = typeof body.email === "string" ? body.email.trim() : "";
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ ok: false, error: "Cuerpo de la solicitud inválido." }, { status: 400 });
+  }
+
+  const nombre = typeof (body as any).nombre === "string" ? (body as any).nombre.trim() : "";
+  const email = typeof (body as any).email === "string" ? (body as any).email.trim() : "";
 
   if (!nombre || !email) {
     return NextResponse.json({ ok: false, error: "Nombre y email son obligatorios." }, { status: 400 });
