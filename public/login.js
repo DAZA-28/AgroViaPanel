@@ -63,4 +63,9 @@ form.addEventListener("submit", async (event) => {
 document.addEventListener("DOMContentLoaded", () => {
   window.RobotController.init();
   window.initParticles();
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("error") === "invite") {
+    window.RobotController.showError("El link de invitación no es válido o ya expiró. Pedile a un admin que te invite de nuevo.");
+  }
 });

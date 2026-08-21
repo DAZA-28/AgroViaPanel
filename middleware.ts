@@ -26,7 +26,8 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   const isLoginPage = request.nextUrl.pathname === "/login.html";
-  if (!user && !isLoginPage) {
+  const isAuthConfirm = request.nextUrl.pathname === "/auth/confirm";
+  if (!user && !isLoginPage && !isAuthConfirm) {
     return NextResponse.redirect(new URL("/login.html", request.url));
   }
 
@@ -34,5 +35,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|login.html|robot.js|login.css|login.js).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|login.html|robot.js|login.css|login.js|auth/confirm).*)"],
 };
