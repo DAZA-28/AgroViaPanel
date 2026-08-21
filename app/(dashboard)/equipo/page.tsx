@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getStaffForUser } from "@/lib/staff";
 import { EquipoTable } from "./EquipoTable";
+import { InvitarForm } from "./InvitarForm";
 import type { StaffRow } from "@/lib/types";
 
 export default async function EquipoPage() {
@@ -16,7 +17,11 @@ export default async function EquipoPage() {
 
   return (
     <div>
-      <h1 style={{ color: "var(--primary)" }}>Equipo</h1>
+      <div className="page-header">
+        <h1>Equipo</h1>
+        <p>Staff con acceso al panel de AgroVia.</p>
+      </div>
+      <InvitarForm />
       <EquipoTable equipoInicial={(equipo ?? []) as StaffRow[]} miPropioId={staff.id} />
     </div>
   );
