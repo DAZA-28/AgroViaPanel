@@ -13,6 +13,17 @@ export function etiquetaEstado(estado: string): string {
   return ETIQUETAS[estado] ?? estado;
 }
 
+const VARIANTES_BADGE: Record<string, string> = {
+  pendiente: "warning",
+  en_revision: "pending",
+  aprobado: "success",
+  rechazado: "error",
+};
+
+export function varianteBadgeEstado(estado: string): string {
+  return VARIANTES_BADGE[estado] ?? "neutral";
+}
+
 export type Accion = "aprobar" | "rechazar" | "pedir_revision";
 
 export function accionesDisponibles(tipo: "proveedor" | "repartidor", estado: string): Accion[] {
