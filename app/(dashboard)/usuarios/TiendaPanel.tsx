@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useModalA11y } from "@/lib/useModalA11y";
 
 type TiendaInfo = {
   nombre: string;
@@ -32,6 +33,7 @@ function urlPublica(path: string | null): string | null {
 export function TiendaPanel({ tiendaId, onClose }: { tiendaId: number; onClose: () => void }) {
   const [tienda, setTienda] = useState<TiendaInfo | null>(null);
   const [productos, setProductos] = useState<ProductoInfo[] | null>(null);
+  const modalRef = useModalA11y<HTMLDivElement>(onClose);
 
   useEffect(() => {
     let activo = true;
@@ -58,7 +60,15 @@ export function TiendaPanel({ tiendaId, onClose }: { tiendaId: number; onClose: 
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal modal--wide" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal modal--wide"
+        onClick={(e) => e.stopPropagation()}
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={tienda?.nombre ?? "Tienda"}
+        tabIndex={-1}
+      >
         <button className="modal-close tienda-panel-close" onClick={onClose} aria-label="Cerrar">
           ×
         </button>

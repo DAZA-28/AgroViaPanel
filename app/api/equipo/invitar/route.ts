@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStaffForUser } from "@/lib/staff";
+import { invitarStaff } from "@/lib/invitar-staff";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -33,18 +34,29 @@ export async function POST(request: NextRequest) {
   }
 
   const admin = createAdminClient();
-  const { data: invitado, error: errorInvitacion } = await admin.auth.admin.inviteUserByEmail(email);
 
-  if (errorInvitacion || !invitado.user) {
-    return NextResponse.json({ ok: false, error: errorInvitacion?.message ?? "No se pudo enviar la invitación." }, { status: 500 });
-  }
+  const resultado = await invitarStaff(
+    {
+      inviteUser: async (correo) => {
+        const { data, error } = await admin.auth.admin.inviteUserByEmail(correo);
+        if (error || !data.user) {
+          return { error: error?.message ?? "No se pudo enviar la invitación." };
+        }
+        return { userId: data.user.id };
+      },
+      insertStaff: async (row) => {
+        const { error } = await admin.from("staff_dashboard").insert(row);
+        return error ? { error: error.message } : null;
+      },
+      deleteUser: async (userId) => {
+        await admin.auth.admin.deleteUser(userId);
+      },
+    },
+    { nombre, email }
+  );
 
-  const { error: errorInsert } = await admin
-    .from("staff_dashboard")
-    .insert({ user_id: invitado.user.id, nombre, email, rol: "operador", activo: true });
-
-  if (errorInsert) {
-    return NextResponse.json({ ok: false, error: `Se envió la invitación pero no se pudo crear el registro de staff: ${errorInsert.message}` }, { status: 500 });
+  if (!resultado.ok) {
+    return NextResponse.json({ ok: false, error: resultado.error }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

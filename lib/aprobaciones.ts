@@ -13,6 +13,14 @@ export function etiquetaEstado(estado: string): string {
   return ETIQUETAS[estado] ?? estado;
 }
 
+export type FiltroEstado = "pendientes" | "aprobado" | "rechazado" | "todos";
+
+export function filtraPorEstado(estado: string, filtro: FiltroEstado): boolean {
+  if (filtro === "todos") return true;
+  if (filtro === "pendientes") return estaPendienteDeRevision(estado);
+  return estado === filtro;
+}
+
 const VARIANTES_BADGE: Record<string, string> = {
   pendiente: "warning",
   en_revision: "pending",

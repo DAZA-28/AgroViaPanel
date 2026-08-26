@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { etiquetaEstado } from "@/lib/aprobaciones";
+import { etiquetaEstado, varianteBadgeEstado } from "@/lib/aprobaciones";
 import { AccionesAprobacion } from "./AccionesAprobacion";
 import type { ProveedorRow, RepartidorRow } from "@/lib/types";
 
@@ -54,15 +54,19 @@ export default async function DetalleAprobacionPage({ params }: { params: Promis
 
   return (
     <div>
-      <h1 style={{ color: "var(--primary)" }}>{fila.nombre}</h1>
-      <p style={{ color: "var(--text-muted)" }}>{fila.email} · {etiquetaEstado(fila.estado_aprobacion)}</p>
-      <div style={{ marginTop: 20, background: "var(--bg-card)", padding: 20, borderRadius: 12 }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="page-header">
+        <h1>{fila.nombre}</h1>
+        <p>
+          {fila.email} · <span className={`badge badge--${varianteBadgeEstado(fila.estado_aprobacion)}`}>{etiquetaEstado(fila.estado_aprobacion)}</span>
+        </p>
+      </div>
+      <div className="card">
+        <table className="data-table">
           <tbody>
             {Object.entries(fila).map(([campo, valor]) => (
-              <tr key={campo} style={{ borderTop: "1px solid var(--border-color)" }}>
-                <td style={{ padding: 8, color: "var(--text-muted)", width: 220 }}>{ETIQUETAS_CAMPO[campo] ?? campo}</td>
-                <td style={{ padding: 8, color: "var(--text-light)" }}>{formatearValor(valor)}</td>
+              <tr key={campo}>
+                <td className="cell-muted" style={{ width: 220 }}>{ETIQUETAS_CAMPO[campo] ?? campo}</td>
+                <td>{formatearValor(valor)}</td>
               </tr>
             ))}
           </tbody>

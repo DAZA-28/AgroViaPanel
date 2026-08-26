@@ -76,12 +76,20 @@ export function Nav({ rol }: { rol: "admin" | "operador" }) {
     }
   }
 
+  function handleBlur(e: React.FocusEvent<HTMLElement>) {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setExpanded(false);
+    }
+  }
+
   return (
     <nav
       className={`sidebar${expanded ? " is-expanded" : ""}`}
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
       onPointerDown={handleTouchToggle}
+      onFocus={() => setExpanded(true)}
+      onBlur={handleBlur}
     >
       <div className="sidebar-brand">AgroVia Panel</div>
       <div className="sidebar-section">
@@ -99,10 +107,10 @@ export function Nav({ rol }: { rol: "admin" | "operador" }) {
           </Link>
         ))}
         {rol === "admin" && (
-          <Link href="/equipo" className={`sidebar-link${pathname === "/equipo" ? " is-active" : ""}`}>
+          <a href="/equipo.html" className="sidebar-link">
             {EQUIPO_ICON}
             <span className="sidebar-link-label">Equipo</span>
-          </Link>
+          </a>
         )}
       </div>
       <div className="sidebar-spacer" />

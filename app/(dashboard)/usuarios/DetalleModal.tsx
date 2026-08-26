@@ -6,6 +6,7 @@ import { etiquetaEstado, varianteBadgeEstado } from "@/lib/aprobaciones";
 import { AccionSuspender } from "./AccionSuspender";
 import { HistorialPedidos } from "./HistorialPedidos";
 import { TiendaPanel } from "./TiendaPanel";
+import { useModalA11y } from "@/lib/useModalA11y";
 
 export type Seleccion =
   | { tipo: "repartidor"; data: RepartidorRow }
@@ -31,6 +32,7 @@ export function DetalleModal({
   onCambiado: (nuevoEstado: string) => void;
 }) {
   const [verTienda, setVerTienda] = useState(false);
+  const modalRef = useModalA11y<HTMLDivElement>(onClose);
 
   const titulo =
     seleccion.tipo === "repartidor"
@@ -42,7 +44,15 @@ export function DetalleModal({
   return (
     <>
       <div className="modal-backdrop" onClick={onClose}>
-        <div className="modal modal--wide" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal modal--wide"
+          onClick={(e) => e.stopPropagation()}
+          ref={modalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={titulo}
+          tabIndex={-1}
+        >
           <div className="modal-header">
             <h2>{titulo}</h2>
             <button className="modal-close" onClick={onClose} aria-label="Cerrar">

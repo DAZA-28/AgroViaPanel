@@ -12,9 +12,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!staff || !staff.activo) redirect("/login.html");
 
   return (
-    <div style={{ display: "flex" }}>
+    <div className="app-shell">
       <Nav rol={staff.rol} />
-      <main style={{ flex: 1, padding: 32 }}>{children}</main>
+      <main className="app-main">{children}</main>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { etiquetaEstado } from "@/lib/aprobaciones";
+import { etiquetaEstado, filtraPorEstado, varianteBadgeEstado, type FiltroEstado } from "@/lib/aprobaciones";
 import type { ProveedorRow, RepartidorRow } from "@/lib/types";
 
 type Fila = { tipo: "proveedor" | "repartidor"; id: number; nombre: string; email: string; estado: string; created_at: string };
@@ -13,19 +13,25 @@ const COLUMNAS_PROVEEDOR =
 const COLUMNAS_REPARTIDOR =
   "id, nombre, email, telefono, activo, foto_url, cedula, tipo_vehiculo, placa, estado_aprobacion, comentario_revision, revisado_por, revisado_en, created_at";
 
-const ESTADOS_PENDIENTES = ["pendiente", "en_revision"];
+const FILTROS_ESTADO: { valor: FiltroEstado; etiqueta: string }[] = [
+  { valor: "pendientes", etiqueta: "Pendientes" },
+  { valor: "aprobado", etiqueta: "Aprobados" },
+  { valor: "rechazado", etiqueta: "Rechazados" },
+  { valor: "todos", etiqueta: "Todos" },
+];
 
 export function AprobacionesTable() {
   const [filas, setFilas] = useState<Fila[]>([]);
-  const [filtro, setFiltro] = useState<"todos" | "proveedor" | "repartidor">("todos");
+  const [filtroTipo, setFiltroTipo] = useState<"todos" | "proveedor" | "repartidor">("todos");
+  const [filtroEstado, setFiltroEstado] = useState<FiltroEstado>("pendientes");
 
   useEffect(() => {
     const supabase = createClient();
 
     async function cargar() {
       const [{ data: proveedores }, { data: repartidores }] = await Promise.all([
-        supabase.from("proveedores").select(COLUMNAS_PROVEEDOR).in("estado_aprobacion", ESTADOS_PENDIENTES).returns<ProveedorRow[]>(),
-        supabase.from("repartidores").select(COLUMNAS_REPARTIDOR).in("estado_aprobacion", ESTADOS_PENDIENTES).returns<RepartidorRow[]>(),
+        supabase.from("proveedores").select(COLUMNAS_PROVEEDOR).returns<ProveedorRow[]>(),
+        supabase.from("repartidores").select(COLUMNAS_REPARTIDOR).returns<RepartidorRow[]>(),
       ]);
 
       const filasProveedores: Fila[] = (proveedores ?? [])
@@ -50,47 +56,62 @@ export function AprobacionesTable() {
     };
   }, []);
 
-  const visibles = filas.filter((f) => filtro === "todos" || f.tipo === filtro);
+  const visibles = filas.filter(
+    (f) => (filtroTipo === "todos" || f.tipo === filtroTipo) && filtraPorEstado(f.estado, filtroEstado)
+  );
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
+      <div className="filter-tabs">
         {(["todos", "proveedor", "repartidor"] as const).map((f) => (
           <button
             key={f}
-            onClick={() => setFiltro(f)}
-            style={{ marginRight: 8, padding: "6px 12px", background: filtro === f ? "var(--primary)" : "var(--bg-card)", border: "none", borderRadius: 6, color: "#fff" }}
+            onClick={() => setFiltroTipo(f)}
+            className={`filter-tab${filtroTipo === f ? " is-active" : ""}`}
           >
             {f === "todos" ? "Todos" : f === "proveedor" ? "Proveedores" : "Repartidores"}
           </button>
         ))}
       </div>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="filter-tabs">
+        {FILTROS_ESTADO.map((f) => (
+          <button
+            key={f.valor}
+            onClick={() => setFiltroEstado(f.valor)}
+            className={`filter-tab${filtroEstado === f.valor ? " is-active" : ""}`}
+          >
+            {f.etiqueta}
+          </button>
+        ))}
+      </div>
+      <table className="data-table">
         <thead>
-          <tr style={{ textAlign: "left", color: "var(--text-muted)" }}>
-            <th style={{ padding: 8 }}>Tipo</th>
-            <th style={{ padding: 8 }}>Nombre</th>
-            <th style={{ padding: 8 }}>Email</th>
-            <th style={{ padding: 8 }}>Estado</th>
-            <th style={{ padding: 8 }}>Registrado</th>
+          <tr>
+            <th>Tipo</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Registrado</th>
           </tr>
         </thead>
         <tbody>
           {visibles.map((f) => (
-            <tr key={`${f.tipo}-${f.id}`} style={{ borderTop: "1px solid var(--border-color)" }}>
-              <td style={{ padding: 8 }}>
+            <tr key={`${f.tipo}-${f.id}`}>
+              <td>
                 <Link href={`/aprobaciones/${f.tipo}/${f.id}`} style={{ color: "var(--primary)" }}>
                   {f.tipo === "proveedor" ? "Proveedor" : "Repartidor"}
                 </Link>
               </td>
-              <td style={{ padding: 8 }}>{f.nombre}</td>
-              <td style={{ padding: 8 }}>{f.email}</td>
-              <td style={{ padding: 8 }}>{etiquetaEstado(f.estado)}</td>
-              <td style={{ padding: 8 }}>{new Date(f.created_at).toLocaleDateString("es-CR")}</td>
+              <td>{f.nombre}</td>
+              <td className="cell-muted">{f.email}</td>
+              <td>
+                <span className={`badge badge--${varianteBadgeEstado(f.estado)}`}>{etiquetaEstado(f.estado)}</span>
+              </td>
+              <td className="cell-muted">{new Date(f.created_at).toLocaleDateString("es-CR")}</td>
             </tr>
           ))}
           {visibles.length === 0 && (
-            <tr><td colSpan={5} style={{ padding: 16, color: "var(--text-muted)" }}>No hay solicitudes pendientes.</td></tr>
+            <tr className="empty-row"><td colSpan={5}>No hay solicitudes para este filtro.</td></tr>
           )}
         </tbody>
       </table>

@@ -1,4 +1,4 @@
-import { createBrowserClient } from "https://esm.sh/@supabase/ssr@0.12.4";
+import { createBrowserClient } from "./vendor/supabase-ssr.js";
 
 const SUPABASE_URL = "https://yoalngiolqwyrhmveosn.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvYWxuZ2lvbHF3eXJobXZlb3NuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMTM2OTEsImV4cCI6MjA5NDc4OTY5MX0.CTm7CBuJS-8BKu3-AfvZEeoGORRGX4gIihrUuNZgUrM";

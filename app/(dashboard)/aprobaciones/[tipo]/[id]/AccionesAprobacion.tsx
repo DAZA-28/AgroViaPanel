@@ -14,7 +14,7 @@ export function AccionesAprobacion({ tipo, id, estado }: { tipo: "proveedor" | "
   const [enviando, setEnviando] = useState(false);
 
   const acciones = accionesDisponibles(tipo, estado);
-  if (acciones.length === 0) return <p style={{ color: "var(--text-muted)" }}>Esta solicitud ya fue resuelta.</p>;
+  if (acciones.length === 0) return <p className="cell-muted">Esta solicitud ya fue resuelta.</p>;
 
   async function confirmar(accion: Accion) {
     if ((accion === "rechazar" || accion === "pedir_revision") && !comentario.trim()) {
@@ -61,17 +61,17 @@ export function AccionesAprobacion({ tipo, id, estado }: { tipo: "proveedor" | "
       )}
       <div style={{ display: "flex", gap: 10 }}>
         {acciones.includes("aprobar") && (
-          <button disabled={enviando} onClick={() => confirmar("aprobar")} style={{ padding: "10px 16px", background: "var(--success)", border: "none", borderRadius: 8, color: "#fff" }}>
+          <button disabled={enviando} onClick={() => confirmar("aprobar")} className="btn btn-success">
             Aprobar
           </button>
         )}
         {acciones.includes("pedir_revision") && (
-          <button disabled={enviando} onClick={() => confirmar("pedir_revision")} style={{ padding: "10px 16px", background: "var(--warning)", border: "none", borderRadius: 8, color: "#fff" }}>
+          <button disabled={enviando} onClick={() => confirmar("pedir_revision")} className="btn btn-warning">
             Pedir revisión
           </button>
         )}
         {acciones.includes("rechazar") && (
-          <button disabled={enviando} onClick={() => confirmar("rechazar")} style={{ padding: "10px 16px", background: "var(--error)", border: "none", borderRadius: 8, color: "#fff" }}>
+          <button disabled={enviando} onClick={() => confirmar("rechazar")} className="btn btn-danger">
             Rechazar
           </button>
         )}

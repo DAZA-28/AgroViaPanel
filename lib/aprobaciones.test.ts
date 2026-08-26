@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { accionesDisponibles, estaPendienteDeRevision, etiquetaEstado, varianteBadgeEstado } from "./aprobaciones";
+import { accionesDisponibles, estaPendienteDeRevision, etiquetaEstado, filtraPorEstado, varianteBadgeEstado } from "./aprobaciones";
 
 describe("estaPendienteDeRevision", () => {
   it("es true para pendiente y en_revision", () => {
@@ -30,6 +30,32 @@ describe("varianteBadgeEstado", () => {
   });
   it("cae a neutral para un estado desconocido", () => {
     expect(varianteBadgeEstado("otro")).toBe("neutral");
+  });
+});
+
+describe("filtraPorEstado", () => {
+  it("el filtro 'pendientes' incluye pendiente y en_revision", () => {
+    expect(filtraPorEstado("pendiente", "pendientes")).toBe(true);
+    expect(filtraPorEstado("en_revision", "pendientes")).toBe(true);
+  });
+  it("el filtro 'pendientes' excluye aprobado y rechazado", () => {
+    expect(filtraPorEstado("aprobado", "pendientes")).toBe(false);
+    expect(filtraPorEstado("rechazado", "pendientes")).toBe(false);
+  });
+  it("el filtro 'aprobado' solo incluye aprobado", () => {
+    expect(filtraPorEstado("aprobado", "aprobado")).toBe(true);
+    expect(filtraPorEstado("rechazado", "aprobado")).toBe(false);
+    expect(filtraPorEstado("pendiente", "aprobado")).toBe(false);
+  });
+  it("el filtro 'rechazado' solo incluye rechazado", () => {
+    expect(filtraPorEstado("rechazado", "rechazado")).toBe(true);
+    expect(filtraPorEstado("aprobado", "rechazado")).toBe(false);
+  });
+  it("el filtro 'todos' incluye cualquier estado", () => {
+    expect(filtraPorEstado("pendiente", "todos")).toBe(true);
+    expect(filtraPorEstado("en_revision", "todos")).toBe(true);
+    expect(filtraPorEstado("aprobado", "todos")).toBe(true);
+    expect(filtraPorEstado("rechazado", "todos")).toBe(true);
   });
 });
 

@@ -1,0 +1,104 @@
+<!--
+  Template de invitación de AgroViaPanel.
+  Pegar el contenido de este archivo en:
+  Supabase Dashboard → Authentication → Emails → "Invite user" → HTML body.
+
+  Asunto sugerido: 🌱 Te invitaron a AgroViaPanel
+
+  Variables usadas: {{ .SiteURL }}, {{ .TokenHash }}, {{ .Email }}
+  (documentadas en https://supabase.com/docs/guides/auth/auth-email-templates)
+-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Te invitaron a AgroViaPanel</title>
+</head>
+<body style="margin:0; padding:0; background-color:#0a0a0a; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0a; padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px; background-color:#141414; border:1px solid #2a2a2a; border-radius:20px; overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background:linear-gradient(135deg, #388E3C 0%, #4CAF50 100%); padding:36px 24px 28px;">
+              <div style="width:64px; height:64px; margin:0 auto 14px; background-color:#141414; border-radius:50%; border:3px solid #81C784; line-height:64px; font-size:30px;">
+                🌱
+              </div>
+              <p style="margin:0; color:#0a0a0a; font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; opacity:0.75;">
+                AgroViaPanel
+              </p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:36px 32px 8px;">
+              <h1 style="margin:0 0 14px; color:#ffffff; font-size:22px; font-weight:700; text-align:center;">
+                ¡Te invitaron al equipo! 🤖
+              </h1>
+              <p style="margin:0 0 24px; color:#b0b0b0; font-size:15px; line-height:1.6; text-align:center;">
+                Alguien del equipo de AgroVia te invitó a sumarte como staff en <strong style="color:#81C784;">AgroViaPanel</strong>,
+                el panel donde se gestionan aprobaciones, usuarios y pedidos del ecosistema AgroVia.
+              </p>
+            </td>
+          </tr>
+
+          <!-- CTA -->
+          <tr>
+            <td align="center" style="padding:0 32px 8px;">
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="border-radius:12px; background:linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);">
+                    <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/aceptar-invitacion"
+                       target="_blank"
+                       style="display:inline-block; padding:16px 40px; color:#06210a; font-size:15px; font-weight:700; text-transform:uppercase; letter-spacing:1px; text-decoration:none; border-radius:12px;">
+                      Aceptar invitación
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Fallback link -->
+          <tr>
+            <td style="padding:20px 32px 4px;">
+              <p style="margin:0 0 6px; color:#666666; font-size:12px; text-align:center;">
+                Si el botón no funciona, copiá y pegá este link en tu navegador:
+              </p>
+              <p style="margin:0; color:#4CAF50; font-size:12px; text-align:center; word-break:break-all;">
+                {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/aceptar-invitacion
+              </p>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding:28px 32px 0;">
+              <div style="border-top:1px solid #2a2a2a;"></div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 32px 32px;">
+              <p style="margin:0; color:#666666; font-size:12px; line-height:1.6; text-align:center;">
+                Esta invitación fue enviada a {{ .Email }}. Si no esperabas este correo, podés ignorarlo con confianza —
+                el link no le da acceso a nadie que no lo abra.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+        <p style="margin:20px 0 0; color:#444444; font-size:11px; text-align:center;">
+          AgroVia · Panel interno de staff
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
