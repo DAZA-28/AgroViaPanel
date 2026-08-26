@@ -2,11 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { etiquetaEstado, varianteBadgeEstado } from "@/lib/aprobaciones";
+import { etiquetaEstado, filtraPorEstado, varianteBadgeEstado, type FiltroEstado } from "@/lib/aprobaciones";
+import { coincideBusqueda } from "@/lib/usuarios";
 import type { ProveedorConTienda, RepartidorRow, UsuarioRow } from "@/lib/types";
 import { DetalleModal, type Seleccion } from "./DetalleModal";
 
 type Pestana = "repartidor" | "proveedor" | "cliente";
+
+const FILTROS_ESTADO: { valor: FiltroEstado; etiqueta: string }[] = [
+  { valor: "todos", etiqueta: "Todos" },
+  { valor: "aprobado", etiqueta: "Aprobados" },
+  { valor: "pendientes", etiqueta: "Pendientes" },
+  { valor: "rechazado", etiqueta: "Rechazados" },
+];
 
 const COLUMNAS_REPARTIDOR =
   "id, nombre, email, telefono, activo, foto_url, cedula, tipo_vehiculo, placa, estado_aprobacion, comentario_revision, revisado_por, revisado_en, created_at";
@@ -20,6 +28,8 @@ export function UsuariosTabs() {
   const [proveedores, setProveedores] = useState<ProveedorConTienda[]>([]);
   const [clientes, setClientes] = useState<UsuarioRow[]>([]);
   const [seleccion, setSeleccion] = useState<Seleccion | null>(null);
+  const [busqueda, setBusqueda] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState<FiltroEstado>("todos");
 
   useEffect(() => {
     const supabase = createClient();
@@ -59,6 +69,16 @@ export function UsuariosTabs() {
     }
   }
 
+  const repartidoresVisibles = repartidores
+    .filter((r) => coincideBusqueda(r.nombre, r.email, busqueda))
+    .filter((r) => filtraPorEstado(r.estado_aprobacion, filtroEstado));
+  const proveedoresVisibles = proveedores
+    .filter((p) => coincideBusqueda(p.nombre, p.email, busqueda))
+    .filter((p) => filtraPorEstado(p.estado_aprobacion, filtroEstado));
+  const clientesVisibles = clientes.filter((c) => coincideBusqueda(c.username ?? "", c.email, busqueda));
+
+  const muestraFiltroEstado = pestana !== "cliente";
+
   return (
     <div>
       <div className="filter-tabs">
@@ -73,6 +93,29 @@ export function UsuariosTabs() {
         </button>
       </div>
 
+      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginBottom: 12 }}>
+        <input
+          type="search"
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          placeholder="Buscar por nombre o email…"
+          style={{ background: "#1a1a1a", color: "#fff", border: "1px solid #333", borderRadius: 8, padding: "8px 12px", fontSize: 14, minWidth: 240 }}
+        />
+        {muestraFiltroEstado && (
+          <div className="filter-tabs" style={{ marginBottom: 0 }}>
+            {FILTROS_ESTADO.map((f) => (
+              <button
+                key={f.valor}
+                onClick={() => setFiltroEstado(f.valor)}
+                className={`filter-tab${filtroEstado === f.valor ? " is-active" : ""}`}
+              >
+                {f.etiqueta}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       {pestana === "repartidor" && (
         <table className="data-table">
           <thead>
@@ -84,7 +127,7 @@ export function UsuariosTabs() {
             </tr>
           </thead>
           <tbody>
-            {repartidores.map((r) => (
+            {repartidoresVisibles.map((r) => (
               <tr key={r.id} onClick={() => setSeleccion({ tipo: "repartidor", data: r })} style={{ cursor: "pointer" }}>
                 <td>{r.nombre}</td>
                 <td className="cell-muted">{r.email}</td>
@@ -94,9 +137,9 @@ export function UsuariosTabs() {
                 </td>
               </tr>
             ))}
-            {repartidores.length === 0 && (
+            {repartidoresVisibles.length === 0 && (
               <tr className="empty-row">
-                <td colSpan={4}>No hay repartidores registrados.</td>
+                <td colSpan={4}>No hay repartidores para este filtro.</td>
               </tr>
             )}
           </tbody>
@@ -114,7 +157,7 @@ export function UsuariosTabs() {
             </tr>
           </thead>
           <tbody>
-            {proveedores.map((p) => (
+            {proveedoresVisibles.map((p) => (
               <tr key={p.id} onClick={() => setSeleccion({ tipo: "proveedor", data: p })} style={{ cursor: "pointer" }}>
                 <td>{p.nombre}</td>
                 <td className="cell-muted">{p.tiendas?.nombre ?? "—"}</td>
@@ -124,9 +167,9 @@ export function UsuariosTabs() {
                 </td>
               </tr>
             ))}
-            {proveedores.length === 0 && (
+            {proveedoresVisibles.length === 0 && (
               <tr className="empty-row">
-                <td colSpan={4}>No hay tiendas registradas.</td>
+                <td colSpan={4}>No hay tiendas para este filtro.</td>
               </tr>
             )}
           </tbody>
@@ -144,7 +187,7 @@ export function UsuariosTabs() {
             </tr>
           </thead>
           <tbody>
-            {clientes.map((c) => (
+            {clientesVisibles.map((c) => (
               <tr key={c.id} onClick={() => setSeleccion({ tipo: "cliente", data: c })} style={{ cursor: "pointer" }}>
                 <td>{c.username ?? "—"}</td>
                 <td className="cell-muted">{c.email}</td>
@@ -152,9 +195,9 @@ export function UsuariosTabs() {
                 <td className="cell-muted">{new Date(c.created_at).toLocaleDateString("es-CR")}</td>
               </tr>
             ))}
-            {clientes.length === 0 && (
+            {clientesVisibles.length === 0 && (
               <tr className="empty-row">
-                <td colSpan={4}>No hay clientes registrados.</td>
+                <td colSpan={4}>No hay clientes para este filtro.</td>
               </tr>
             )}
           </tbody>

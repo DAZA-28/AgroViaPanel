@@ -5,3 +5,9 @@ export function accionCuentaDisponible(estado: string): AccionCuenta | null {
   if (estado === "rechazado") return "reactivar";
   return null;
 }
+
+export function coincideBusqueda(nombre: string, email: string, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  return nombre.toLowerCase().includes(q) || email.toLowerCase().includes(q);
+}

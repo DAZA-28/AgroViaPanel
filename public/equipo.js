@@ -84,7 +84,15 @@ function crearFilaEquipo(s) {
   btnToggle.addEventListener("click", () => alternarActivo(s.id, s.activo, tr));
   tdAccion.appendChild(btnToggle);
 
-  tr.append(tdNombre, tdEmail, tdRol, tdActivo, tdAccion);
+  const tdQuitar = document.createElement("td");
+  const btnQuitar = document.createElement("button");
+  btnQuitar.className = "btn btn-danger";
+  btnQuitar.disabled = esUnoMismo;
+  btnQuitar.textContent = "Quitar";
+  btnQuitar.addEventListener("click", () => quitarMiembro(s.id, s.nombre, tr));
+  tdQuitar.appendChild(btnQuitar);
+
+  tr.append(tdNombre, tdEmail, tdRol, tdActivo, tdAccion, tdQuitar);
   tr.dataset.id = String(s.id);
   return tr;
 }
@@ -107,13 +115,33 @@ async function alternarActivo(id, activo, filaActual) {
   filaActual.replaceWith(crearFilaEquipo(data[0]));
 }
 
+async function quitarMiembro(id, nombre, filaActual) {
+  if (!confirm(`¿Quitar a ${nombre} del equipo? Pierde el acceso al panel de inmediato.`)) {
+    return;
+  }
+  try {
+    const res = await fetch(`/api/equipo/${id}`, { method: "DELETE" });
+    const data = await res.json();
+    if (!data.ok) {
+      alert(data.error ?? "No se pudo quitar a esta persona del equipo.");
+      return;
+    }
+    filaActual.remove();
+    if (tbodyEquipo.children.length === 0) {
+      renderEquipo([]);
+    }
+  } catch {
+    alert("No se pudo conectar con el servidor. Intentá de nuevo.");
+  }
+}
+
 function renderEquipo(equipo) {
   tbodyEquipo.innerHTML = "";
   if (equipo.length === 0) {
     const tr = document.createElement("tr");
     tr.className = "empty-row";
     const td = document.createElement("td");
-    td.colSpan = 5;
+    td.colSpan = 6;
     td.textContent = "Sin staff registrado.";
     tr.appendChild(td);
     tbodyEquipo.appendChild(tr);

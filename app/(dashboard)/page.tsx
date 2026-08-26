@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { construirGruposMetricas, type ConteosMetricas } from "@/lib/metricas";
+import { StatCard } from "./StatCard";
 
 async function contar(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -54,20 +55,21 @@ export default async function HomePage() {
   const grupos = construirGruposMetricas(conteos);
 
   return (
-    <div>
-      <div className="page-header">
-        <h1>Métricas</h1>
-        <p>Estado general del ecosistema AgroVia en este momento.</p>
+    <div className="view-panel" style={{ position: "relative" }}>
+      <div className="ambient-glow" aria-hidden="true"></div>
+      <div className="page-header-row">
+        <div className="page-header">
+          <h1>Métricas</h1>
+          <p>Estado general del ecosistema AgroVia en este momento.</p>
+        </div>
+        <div className="live-badge"><span className="live-dot"></span>En vivo</div>
       </div>
       {grupos.map((grupo) => (
         <div className="stat-group" key={grupo.title}>
           <div className="stat-group-title">{grupo.title}</div>
           <div className="stat-grid">
             {grupo.stats.map((stat) => (
-              <div className={`stat-card${stat.accent ? " stat-card--accent" : ""}`} key={stat.label}>
-                <div className="stat-card-value">{stat.value}</div>
-                <div className="stat-card-label">{stat.label}</div>
-              </div>
+              <StatCard key={stat.label} value={stat.value} label={stat.label} accent={stat.accent} />
             ))}
           </div>
         </div>
