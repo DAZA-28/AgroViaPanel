@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { etiquetaEstado, varianteBadgeEstado } from "@/lib/aprobaciones";
-import { fechaDesde, type RangoFecha } from "@/lib/auditoria";
+import { fechaDesde, type RangoFecha } from "@/lib/fechas";
 import type { AuditoriaRow, StaffRow } from "@/lib/types";
 
 const PAGINA = 50;

@@ -11,4 +11,5 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/salud", label: "Salud del sistema", enabled: false },
   { href: "/usuarios", label: "Usuarios", enabled: true },
   { href: "/auditoria", label: "Auditoría", enabled: true },
+  { href: "/ventas", label: "Ventas", enabled: true },
 ];
