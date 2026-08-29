@@ -77,3 +77,16 @@ export interface StaffRow {
   activo: boolean;
   created_at: string;
 }
+
+export interface AuditoriaRow {
+  id: number;
+  entidad_tipo: "proveedor" | "repartidor";
+  entidad_id: number;
+  entidad_nombre: string;
+  estado_anterior: string | null;
+  estado_nuevo: string;
+  comentario: string | null;
+  staff_id: string | null;
+  staff_nombre: string | null;
+  creado_en: string;
+}
