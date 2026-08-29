@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { etiquetaTransicion, fechaDesde, type RangoFecha } from "@/lib/auditoria";
+import { etiquetaEstado, varianteBadgeEstado } from "@/lib/aprobaciones";
+import { fechaDesde, type RangoFecha } from "@/lib/auditoria";
 import type { AuditoriaRow, StaffRow } from "@/lib/types";
 
 const PAGINA = 50;
@@ -23,6 +25,8 @@ export function AuditoriaTable() {
   const [hayMas, setHayMas] = useState(false);
   const [cargandoMas, setCargandoMas] = useState(false);
 
+  const ahora = useMemo(() => new Date(), [rango, tipo, staffId]);
+
   const cargarPagina = useCallback(
     async (desde: number) => {
       const supabase = createClient();
@@ -32,15 +36,19 @@ export function AuditoriaTable() {
         .order("creado_en", { ascending: false })
         .range(desde, desde + PAGINA - 1);
 
-      const corte = fechaDesde(rango);
+      const corte = fechaDesde(rango, ahora);
       if (corte) query = query.gte("creado_en", corte);
       if (tipo !== "todos") query = query.eq("entidad_tipo", tipo);
       if (staffId !== "todos") query = query.eq("staff_id", staffId);
 
-      const { data } = await query.returns<AuditoriaRow[]>();
+      const { data, error } = await query.returns<AuditoriaRow[]>();
+      if (error) {
+        toast.error("No se pudo cargar el historial de auditoría.");
+        return [];
+      }
       return data ?? [];
     },
-    [rango, tipo, staffId]
+    [rango, tipo, staffId, ahora]
   );
 
   useEffect(() => {
@@ -56,13 +64,18 @@ export function AuditoriaTable() {
 
     const channel = supabase
       .channel("auditoria-aprobaciones")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "auditoria_aprobaciones" }, cargarInicial)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "auditoria_aprobaciones" }, (payload) => {
+        const fila = payload.new as AuditoriaRow;
+        if (tipo !== "todos" && fila.entidad_tipo !== tipo) return;
+        if (staffId !== "todos" && fila.staff_id !== staffId) return;
+        setFilas((actuales) => [fila, ...actuales]);
+      })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [cargarPagina]);
+  }, [cargarPagina, tipo, staffId]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -124,7 +137,15 @@ export function AuditoriaTable() {
               <td>
                 {f.entidad_tipo === "proveedor" ? "Proveedor" : "Repartidor"} · {f.entidad_nombre}
               </td>
-              <td>{etiquetaTransicion(f.estado_anterior, f.estado_nuevo)}</td>
+              <td>
+                {f.estado_anterior ? (
+                  <span className={`badge badge--${varianteBadgeEstado(f.estado_anterior)}`}>{etiquetaEstado(f.estado_anterior)}</span>
+                ) : (
+                  <span className="cell-muted">—</span>
+                )}
+                {" → "}
+                <span className={`badge badge--${varianteBadgeEstado(f.estado_nuevo)}`}>{etiquetaEstado(f.estado_nuevo)}</span>
+              </td>
               <td className="cell-muted">{f.staff_nombre ?? f.staff_id ?? "—"}</td>
               <td className="cell-muted">{f.comentario ?? "—"}</td>
             </tr>
