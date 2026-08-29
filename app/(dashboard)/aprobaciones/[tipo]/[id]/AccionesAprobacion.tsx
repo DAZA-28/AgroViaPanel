@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { accionesDisponibles, type Accion } from "@/lib/aprobaciones";
 
@@ -41,9 +42,13 @@ export function AccionesAprobacion({ tipo, id, estado }: { tipo: "proveedor" | "
     setEnviando(false);
 
     if (!data || data.length === 0) {
-      alert("No se pudo guardar la decisión. Puede que no tengas permiso o la solicitud ya haya cambiado.");
+      toast.error("No se pudo guardar la decisión. Puede que no tengas permiso o la solicitud ya haya cambiado.");
       return;
     }
+
+    const mensajeExito =
+      accion === "aprobar" ? "Solicitud aprobada." : accion === "rechazar" ? "Solicitud rechazada." : "Se pidió revisión al solicitante.";
+    toast.success(mensajeExito);
 
     router.push("/aprobaciones");
     router.refresh();

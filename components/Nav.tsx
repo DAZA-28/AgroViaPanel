@@ -98,6 +98,7 @@ export function Nav({ rol }: { rol: "admin" | "operador" }) {
             key={item.href}
             href={item.enabled ? item.href : "#"}
             className={`sidebar-link${pathname === item.href ? " is-active" : ""}${!item.enabled ? " is-disabled" : ""}`}
+            aria-current={pathname === item.href ? "page" : undefined}
           >
             {ICONS[item.href]}
             <span className="sidebar-link-label">

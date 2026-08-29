@@ -32,6 +32,11 @@ export function varianteBadgeEstado(estado: string): string {
   return VARIANTES_BADGE[estado] ?? "neutral";
 }
 
+export function nombreRevisor(revisadoPor: string | null, staffPorId: Record<string, string>): string {
+  if (!revisadoPor) return "—";
+  return staffPorId[revisadoPor] ?? revisadoPor;
+}
+
 export type Accion = "aprobar" | "rechazar" | "pedir_revision";
 
 export function accionesDisponibles(tipo: "proveedor" | "repartidor", estado: string): Accion[] {

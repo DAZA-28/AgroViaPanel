@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { accionesDisponibles, estaPendienteDeRevision, etiquetaEstado, filtraPorEstado, varianteBadgeEstado } from "./aprobaciones";
+import { accionesDisponibles, estaPendienteDeRevision, etiquetaEstado, filtraPorEstado, nombreRevisor, varianteBadgeEstado } from "./aprobaciones";
 
 describe("estaPendienteDeRevision", () => {
   it("es true para pendiente y en_revision", () => {
@@ -56,6 +56,18 @@ describe("filtraPorEstado", () => {
     expect(filtraPorEstado("en_revision", "todos")).toBe(true);
     expect(filtraPorEstado("aprobado", "todos")).toBe(true);
     expect(filtraPorEstado("rechazado", "todos")).toBe(true);
+  });
+});
+
+describe("nombreRevisor", () => {
+  it("devuelve un guion cuando todavia no se reviso", () => {
+    expect(nombreRevisor(null, {})).toBe("—");
+  });
+  it("devuelve el nombre del staff cuando esta en el mapa", () => {
+    expect(nombreRevisor("uuid-1", { "uuid-1": "Ana Pérez" })).toBe("Ana Pérez");
+  });
+  it("cae al id crudo si el staff no esta en el mapa (ej. cuenta borrada)", () => {
+    expect(nombreRevisor("uuid-2", {})).toBe("uuid-2");
   });
 });
 

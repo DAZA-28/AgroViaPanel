@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { accionCuentaDisponible } from "@/lib/usuarios";
 
@@ -54,10 +55,11 @@ export function AccionSuspender({
     setEnviando(false);
 
     if (!data || data.length === 0) {
-      alert("No se pudo guardar el cambio. Puede que no tengas permiso o el registro ya no exista.");
+      toast.error("No se pudo guardar el cambio. Puede que no tengas permiso o el registro ya no exista.");
       return;
     }
 
+    toast.success(accion === "suspender" ? "Cuenta suspendida." : "Cuenta reactivada.");
     setPidiendoMotivo(false);
     setMotivo("");
     onCambiado(nuevoEstado);

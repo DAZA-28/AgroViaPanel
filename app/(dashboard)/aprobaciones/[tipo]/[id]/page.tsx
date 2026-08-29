@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { etiquetaEstado, varianteBadgeEstado } from "@/lib/aprobaciones";
+import { etiquetaEstado, nombreRevisor, varianteBadgeEstado } from "@/lib/aprobaciones";
 import { AccionesAprobacion } from "./AccionesAprobacion";
 import type { ProveedorRow, RepartidorRow } from "@/lib/types";
 
@@ -36,7 +36,8 @@ const ETIQUETAS_CAMPO: Record<string, string> = {
   placa: "Placa",
 };
 
-function formatearValor(valor: unknown): string {
+function formatearValor(campo: string, valor: unknown, staffPorId: Record<string, string>): string {
+  if (campo === "revisado_por") return nombreRevisor(valor as string | null, staffPorId);
   if (valor === null || valor === undefined || valor === "") return "—";
   if (typeof valor === "boolean") return valor ? "Sí" : "No";
   return String(valor);
@@ -47,10 +48,14 @@ export default async function DetalleAprobacionPage({ params }: { params: Promis
   if (tipo !== "proveedor" && tipo !== "repartidor") notFound();
 
   const supabase = await createClient();
-  const { data, error } = await supabase.from(TABLA[tipo]).select(COLUMNAS[tipo]).eq("id", Number(id)).single();
+  const [{ data, error }, { data: staff }] = await Promise.all([
+    supabase.from(TABLA[tipo]).select(COLUMNAS[tipo]).eq("id", Number(id)).single(),
+    supabase.from("staff_dashboard").select("user_id, nombre"),
+  ]);
   if (error || !data) notFound();
 
   const fila = data as unknown as ProveedorRow | RepartidorRow;
+  const staffPorId = Object.fromEntries((staff ?? []).map((s) => [s.user_id, s.nombre]));
 
   return (
     <div>
@@ -66,7 +71,7 @@ export default async function DetalleAprobacionPage({ params }: { params: Promis
             {Object.entries(fila).map(([campo, valor]) => (
               <tr key={campo}>
                 <td className="cell-muted" style={{ width: 220 }}>{ETIQUETAS_CAMPO[campo] ?? campo}</td>
-                <td>{formatearValor(valor)}</td>
+                <td>{formatearValor(campo, valor, staffPorId)}</td>
               </tr>
             ))}
           </tbody>
